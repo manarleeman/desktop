@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WebOS</title>
+<style>
+:root{--fg:#f3f5fb;--glass:rgba(22,24,36,.72);--glass2:rgba(255,255,255,.07);--bd:rgba(255,255,255,.14);--win:#1b1d2a;--inp:#11131c;--acc:#7c6cff;color-scheme:dark}
+:root[data-theme=light]{--fg:#161824;--glass:rgba(255,255,255,.78);--glass2:rgba(0,0,0,.05);--bd:rgba(0,0,0,.12);--win:#fff;--inp:#f1f2f7;color-scheme:light}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden;font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--fg);background:#000}
+button,input,textarea{font:inherit;color:inherit}
+#desk{position:fixed;inset:0;background-size:cover;transition:background .5s}
+.icons{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:12px;bottom:64px;display:grid;grid-auto-flow:column;grid-template-rows:repeat(auto-fill,92px);grid-auto-columns:88px;gap:6px;align-content:start}
+.di{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:10px;color:#fff;text-shadow:0 1px 4px #000a;cursor:default;user-select:none;border:1px solid transparent}
+.di:hover,.di.sel{background:#ffffff26;border-color:#ffffff30}
+.di .ic{font-size:34px;line-height:1}
+.di span{font-size:12px;text-align:center}
+.win{position:absolute;background:var(--win);border:1px solid var(--bd);border-radius:12px;box-shadow:0 18px 50px #0008;display:flex;flex-direction:column;overflow:hidden;min-width:260px;min-height:170px;resize:both;animation:pop .18s ease-out}
+.win:not(.active){box-shadow:0 8px 24px #0005;opacity:.96}
+.win.max{left:0!important;top:0!important;right:0!important;bottom:48px!important;width:auto!important;height:auto!important;border-radius:0;resize:none}
+.win.min{display:none}
+@keyframes pop{from{transform:scale(.94);opacity:0}}
+.tb{height:38px;flex:none;display:flex;align-items:center;gap:8px;padding:0 8px 0 12px;background:var(--glass2);user-select:none;touch-action:none}
+.tb b{flex:1;font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb button{width:28px;height:26px;border:0;border-radius:7px;background:transparent;cursor:pointer}
+.tb button:hover{background:var(--glass2)}.tb .x:hover{background:#e5484d;color:#fff}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto}
+.bar{display:flex;gap:8px;align-items:center;padding:8px;border-bottom:1px solid var(--bd);flex:none}
+.bar input{flex:1;min-width:0;background:var(--inp);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;outline:none}
+.bar input:focus{border-color:var(--acc)}
+.btn{background:var(--glass2);border:1px solid var(--bd);border-radius:8px;padding:5px 11px;cursor:pointer}
+.btn:hover{border-color:var(--acc)}.btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.path{opacity:.7;font-size:12px;white-space:nowrap}
+.grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,92px);gap:6px;padding:10px;align-content:start}
+.item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:9px;text-align:center;font-size:12px;word-break:break-all;cursor:default}
+.item:hover{background:var(--glass2)}.item .ic{font-size:32px}
+.empty{grid-column:1/-1;opacity:.55;text-align:center;padding:30px}
+textarea{flex:1;resize:none;border:0;outline:0;background:transparent;padding:12px;font:13px/1.55 ui-monospace,Menlo,Consolas,monospace}
+.term{background:#0b0d14;color:#d6f5dc;padding:10px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;display:block}
+.term div{white-space:pre-wrap;word-break:break-word}.term .c{color:#8aa}
+.ln{display:flex}.ln span{color:#7ee787;white-space:pre}.ln input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff}
+.page{flex:1;overflow:auto;padding:22px;background:var(--win)}
+.hm{text-align:center;padding-top:6vh}.hm h1{font-size:44px;margin:0 0 18px;background:linear-gradient(90deg,#7c6cff,#ff6fb5);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hm input{width:min(440px,90%);padding:11px 16px;border-radius:99px;border:1px solid var(--bd);background:var(--inp);outline:none}
+.tiles{display:flex;gap:10px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+.page a{cursor:pointer;color:var(--acc)}.tiles a{background:var(--glass2);padding:10px 16px;border-radius:12px;color:var(--fg)}
+.res{margin:0 0 16px}.res a{font-size:16px}.res small{display:block;opacity:.6}
+.calc{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px;flex:1}
+.calc .disp{grid-column:1/-1;background:var(--inp);border-radius:10px;padding:12px;text-align:right;font-size:24px;overflow:hidden}
+.calc button{border:1px solid var(--bd);background:var(--glass2);border-radius:10px;font-size:17px;cursor:pointer}
+.calc button:hover{border-color:var(--acc)}.calc .op{background:var(--acc);color:#fff}
+.set{padding:16px;display:grid;gap:18px}.set h4{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.sw{display:flex;gap:8px;flex-wrap:wrap}.sw i{width:56px;height:36px;border-radius:9px;border:2px solid transparent;cursor:pointer}.sw i.on{border-color:var(--fg)}
+.sw.c i{width:28px;height:28px;border-radius:50%}
+#task{position:fixed;left:0;right:0;bottom:0;height:calc(48px + env(safe-area-inset-bottom,0px));padding:0 10px env(safe-area-inset-bottom,0px);display:flex;align-items:center;gap:6px;background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);border-top:1px solid var(--bd);z-index:99999}
+#task .st{font-size:20px;border:0;background:var(--acc);color:#fff;border-radius:10px;width:38px;height:34px;cursor:pointer}
+#tasks{flex:1;display:flex;gap:6px;overflow:auto}
+.tk{border:1px solid transparent;background:var(--glass2);border-radius:9px;padding:5px 12px;cursor:pointer;white-space:nowrap}
+.tk.active{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 25%,transparent)}
+#clock{text-align:right;font-size:12px;line-height:1.2;padding:0 6px;white-space:nowrap}
+#menu,#ctx{position:fixed;z-index:100000;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--bd);border-radius:14px;box-shadow:0 20px 50px #0008;padding:8px;display:none}
+#menu{left:10px;bottom:calc(58px + env(safe-area-inset-bottom,0px));width:260px}
+#menu.o,#ctx.o{display:block;animation:pop .15s}
+#menu div,#ctx div{padding:8px 10px;border-radius:8px;cursor:pointer}
+#menu div:hover,#ctx div:hover{background:var(--acc);color:#fff}
+#boot{position:fixed;inset:0;z-index:999999;background:#07080d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:#fff;transition:opacity .6s}
+#boot .lg{font-size:64px;animation:pulse 1.2s infinite}#boot .pb{width:180px;height:4px;background:#ffffff22;border-radius:9px;overflow:hidden}
+#boot .pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7c6cff,#ff6fb5);animation:ld 1.5s forwards}
+@keyframes ld{to{width:100%}}@keyframes pulse{50%{transform:scale(1.08)}}
+</style></head><body>
+<div id="desk"><div class="icons" id="icons"></div></div>
+<div id="menu"></div><div id="ctx"></div>
+<div id="task"><button class="st" id="st" title="Start">⊞</button><div id="tasks"></div><div id="clock"></div></div>
+<div id="boot"><div class="lg">🖥️</div><b>WebOS</b><div class="pb"><i></i></div></div>
+<script>
+const $=(s,e=document)=>e.querySelector(s);
+const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const WALL=['linear-gradient(135deg,#1b1464,#6a3de8 45%,#ff6fb5)','radial-gradient(at 20% 20%,#0ea5e9,transparent 55%),radial-gradient(at 80% 75%,#a855f7,transparent 55%),#0b1020','linear-gradient(160deg,#0f2027,#203a43,#2c5364)','linear-gradient(135deg,#f6d365,#fda085)','linear-gradient(135deg,#134e5e,#71b280)'];
+const ACC=['#7c6cff','#ff4d8d','#18b6a4','#f59e0b','#3b82f6'];
+let S={wall:0,acc:ACC[0],theme:''};
+try{Object.assign(S,JSON.parse(localStorage.getItem('webos')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('webos',JSON.stringify(S))}catch(e){}};
+function apply(){const r=document.documentElement;r.style.setProperty('--acc',S.acc);r.dataset.theme=S.theme||(matchMedia('(prefers-color-scheme:light)').matches?'light':'dark');$('#desk').style.background=WALL[S.wall]}
+matchMedia('(prefers-color-scheme:light)').addEventListener('change',apply);
+const T0=Date.now();
+const FS={Desktop:{},Documents:{'welcome.txt':`Welcome to WebOS ✨\n\n• Drag windows by their title bar, resize from the corner.\n• Double-click desktop icons to open apps.\n• Open the Terminal and type "help".\n• Right-click the desktop for more.\n• Change wallpaper, accent and theme in Settings.`,'todo.md':'# To do\n- [x] Boot the OS\n- [ ] Conquer the world\n- [ ] Lunch'},Pictures:{},Music:{},Projects:{'hello.js':'console.log("Hello, WebOS!");'}};
+const dir=p=>p.reduce((o,k)=>o[k],FS);
+const APPS={
+files:{t:'Files',i:'📁',w:580,h:400,mk:files},
+terminal:{t:'Terminal',i:'⌨️',w:600,h:380,mk:terminal},
+browser:{t:'Wander Browser',i:'🌐',w:720,h:470,mk:browser},
+notes:{t:'Notepad',i:'📝',w:480,h:360,mk:notes},
+calc:{t:'Calculator',i:'🧮',w:300,h:430,mk:calc},
+settings:{t:'Settings',i:'⚙️',w:520,h:440,mk:settings}};
+let z=10,n=0,wins=[];
+function focus(o){z++;o.w.style.zIndex=z;wins.forEach(x=>{x.w.classList.toggle('active',x===o);x.t.classList.toggle('active',x===o&&!o.w.classList.contains('min'))})}
+function openApp(id,arg){const a=APPS[id];if(!a)return;
+const w=h('div','win'),tb=h('div','tb'),body=h('div','body');
+const W0=Math.min(a.w,innerWidth-16),H0=Math.min(a.h,innerHeight-70),k=n++%6-3;
+w.style.cssText=`width:${W0}px;height:${H0}px;left:${Math.max(8,(innerWidth-W0)/2+k*26)}px;top:${Math.max(8,(innerHeight-H0)/2-30+k*22)}px`;
+const bm=h('button','','–'),bx=h('button','','▢'),bc=h('button','x','✕');
+tb.append(h('span','',a.i),h('b','',a.t),bm,bx,bc);w.append(tb,body);$('#desk').append(w);
+const t=h('button','tk',a.i+' '+a.t),o={w,t};wins.push(o);$('#tasks').append(t);
+const mx=()=>{w.classList.toggle('max');focus(o)};
+bm.onclick=()=>{w.classList.add('min');t.classList.remove('active')};
+bx.onclick=mx;tb.ondblclick=e=>{if(!e.target.closest('button'))mx()};
+bc.onclick=()=>{w.remove();t.remove();wins=wins.filter(x=>x!==o)};
+t.onclick=()=>{if(w.classList.contains('min')){w.classList.remove('min');focus(o)}else if(t.classList.contains('active'))bm.onclick();else focus(o)};
+w.onpointerdown=()=>focus(o);
+tb.onpointerdown=e=>{if(e.target.closest('button')||w.classList.contains('max'))return;const r=w.getBoundingClientRect(),dx=e.clientX-r.left,dy=e.clientY-r.top;tb.setPointerCapture(e.pointerId);
+tb.onpointermove=m=>{w.style.left=Math.min(innerWidth-80,Math.max(80-r.width,m.clientX-dx))+'px';w.style.top=Math.min(innerHeight-90,Math.max(0,m.clientY-dy))+'px'};tb.onpointerup=()=>{tb.onpointermove=null}};
+if(innerWidth<700)w.classList.add('max');
+a.mk(body,o,arg);focus(o);const f=$('input,textarea',body);if(f&&id!='files')f.focus()}
+/* Files */
+function files(el,o,start){let p=start||[];const bar=h('div','bar'),list=h('div','grid');el.append(bar,list);
+function draw(){bar.innerHTML='';const b=h('button','btn','←'),nf=h('input');nf.placeholder='New folder + Enter';
+b.onclick=()=>{p.pop();draw()};nf.onkeydown=e=>{if(e.key=='Enter'&&nf.value.trim()){dir(p)[nf.value.trim()]={};draw()}};
+bar.append(b,h('span','path','/'+p.join('/')),nf);list.innerHTML='';
+const d=dir(p),ks=Object.keys(d).sort();if(!ks.length)list.append(h('div','empty','This folder is empty'));
+ks.forEach(k=>{const it=h('div','item'),dr=typeof d[k]=='object';it.append(h('div','ic',dr?'📁':'📄'),h('div','',k));
+it.ondblclick=()=>{if(dr){p.push(k);draw()}else openApp('notes',{path:[...p],name:k})};list.append(it)})}
+draw()}
+/* Notepad */
+function notes(el,o,a){const bar=h('div','bar'),nm=h('input'),sv=h('button','btn','Save'),msg=h('span','path'),ta=h('textarea'),path=a?a.path:['Documents'];
+nm.value=a?a.name:'untitled.txt';ta.value=a?dir(a.path)[a.name]:'';ta.placeholder='Start typing…';
+sv.onclick=()=>{dir(path)[nm.value]=ta.value;msg.textContent='Saved to /'+path.join('/')};
+ta.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&e.key=='s'){e.preventDefault();sv.click()}};
+bar.append(nm,sv,msg);el.append(bar,ta)}
+/* Terminal */
+function terminal(el){let cwd=[],hist=[],hi=0;el.classList.add('term');el.style.display='block';
+const out=h('div'),ln=h('div','ln'),ps=h('span'),inp=h('input');inp.spellcheck=false;inp.autocapitalize='off';ln.append(ps,inp);el.append(out,ln);
+const P=()=>ps.textContent=`guest@webos:/${cwd.join('/')}$ `,pr=(t,c)=>{out.append(h('div',c||'',t));el.scrollTop=1e9};
+const res=s=>{const r=s.startsWith('/')?[]:[...cwd];for(const x of s.split('/')){if(!x||x=='.'||x=='~')continue;x=='..'?r.pop():r.push(x)}return r};
+const node=r=>{let o=FS;for(const k of r){if(typeof o!='object'||!(k in o))return;o=o[k]}return o};
+const par=s=>{const r=res(s),k=r.pop();return[node(r),k]};
+const Q=['The best code is no code at all.','It works on my machine.','There are only two hard things: cache invalidation and naming things.','Have you tried turning it off and on again?'];
+const C={help:()=>pr('Commands: help  ls  cd  pwd  cat  mkdir  touch  rm  echo [text > file]  clear  date  whoami\n          neofetch  fortune  open <files|terminal|browser|notes|calc|settings>\n          theme <dark|light>  color <#hex>',"c"),
+ls:a=>{const d=node(res(a[0]||''));pr(typeof d!='object'?'ls: not a directory':Object.keys(d).map(k=>typeof d[k]=='object'?k+'/':k).join('   ')||'(empty)')},
+cd:a=>{const r=res(a[0]||'');typeof node(r)=='object'?cwd=r:pr('cd: no such directory')},
+pwd:()=>pr('/'+cwd.join('/')),
+cat:a=>{const d=node(res(a[0]||''));pr(typeof d=='string'?d:'cat: not a file')},
+mkdir:a=>{const[d,k]=par(a[0]||'');typeof d=='object'&&k?d[k]={}:pr('mkdir: failed')},
+touch:a=>{const[d,k]=par(a[0]||'');typeof d=='object'&&k?d[k]??=''  :pr('touch: failed')},
+rm:a=>{const[d,k]=par(a[0]||'');typeof d=='object'&&k in d?delete d[k]:pr('rm: not found')},
+clear:()=>{out.innerHTML=''},date:()=>pr(new Date().toString()),whoami:()=>pr('guest'),fortune:()=>pr(Q[Math.random()*Q.length|0]),
+neofetch:()=>pr(`  ╭──────────╮   guest@webos\n  │  ◉    ◉  │   ─────────────\n  │    ▽     │   OS: WebOS 1.0\n  ╰──────────╯   Kernel: JavaScript\n                 Shell: websh\n                 Uptime: ${((Date.now()-T0)/1000|0)}s\n                 Windows: ${wins.length}\n                 Theme: ${document.documentElement.dataset.theme}`,'c'),
+open:a=>APPS[a[0]]?openApp(a[0]):pr('open: unknown app'),
+theme:a=>{if(['dark','light'].includes(a[0])){S.theme=a[0];apply();save()}else pr('usage: theme dark|light')},
+color:a=>{if(/^#[0-9a-f]{3,8}$/i.test(a[0]||'')){S.acc=a[0];apply();save()}else pr('usage: color #ff4d8d')},
+sudo:()=>pr('Nice try. 😏')};
+function run(l){pr(ps.textContent+l);const raw=l.trim();if(!raw)return;hist.push(raw);hi=hist.length;
+if(raw.startsWith('echo')){const t=raw.slice(4).trim().split(' > ');if(t[1]){const[d,k]=par(t[1].trim());if(typeof d=='object'&&k)d[k]=t[0];}else pr(t[0]);return}
+const[c,...a]=raw.split(/\s+/);C[c]?C[c](a):pr(c+': command not found')}
+inp.onkeydown=e=>{if(e.key=='Enter'){const v=inp.value;inp.value='';run(v);P()}else if(e.key=='ArrowUp'){hi=Math.max(0,hi-1);inp.value=hist[hi]||'';e.preventDefault()}else if(e.key=='ArrowDown'){hi=Math.min(hist.length,hi+1);inp.value=hist[hi]||''}};
+el.onclick=()=>{if(!getSelection().toString())inp.focus()};
+pr('WebOS terminal — type "help" to get started.','c');P()}
+/* Browser */
+function browser(el){const bar=h('div','bar'),bk=h('button','btn','←'),url=h('input'),go=h('button','btn','Go'),view=h('div','page'),hs=[];
+bar.append(bk,url,go);el.append(bar,view);
+const home=`<div class="hm"><h1>Wander</h1><input placeholder="Search the (simulated) web…"><div class="tiles"><a data-u="webos://news">📰 News</a><a data-u="webos://about">ℹ️ About</a><a data-u="wikipedia.org">📚 Wiki</a><a data-u="github.com">🐙 Code</a></div></div>`;
+function page(u){if(u=='webos://home')return home;
+if(u=='webos://about')return`<h2>About WebOS</h2><p>A tiny operating system that lives entirely in your browser tab. Windows, files, a shell, settings and this browser are all plain JavaScript.</p><a data-u="webos://home">← Home</a>`;
+if(u=='webos://news')return`<h2>Today on WebOS</h2><div class="res"><a data-u="webos://about">Local tab achieves operating system status</a><small>wander.news · 2 min ago</small></div><div class="res"><a data-u="webos://about">Terminal users report “ls” is still the best command</a><small>wander.news · 1 hr ago</small></div><div class="res"><a data-u="webos://about">Cursor spotted dragging windows with confidence</a><small>wander.news · today</small></div>`;
+if(/^[^\s]+\.[a-z]{2,}(\/.*)?$/i.test(u))return`<div style="text-align:center;padding-top:40px"><div style="font-size:54px">🌐</div><h2>Can’t reach ${esc(u)}</h2><p style="opacity:.7">This is a simulated browser, so real sites aren’t available. Try a search instead.</p><a data-u="webos://home">← Home</a></div>`;
+const s=u.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,20)||'home',q=esc(u);
+return`<p style="opacity:.6">About 3 results for “${q}”</p>`+[['The complete guide to','Everything you ever wanted to know about'],['Why everyone is talking about','A deep dive into'],['Top 10 facts about','Beginner’s handbook to']].map((r,i)=>`<div class="res"><a data-u="${s}${i}.wander.net">${r[0]} ${q}</a><small>${s}${i}.wander.net</small>${r[1]} ${q} — updated daily by people who definitely exist.</div>`).join('')}
+function nav(u,push=true){u=u.trim()||'webos://home';if(push)hs.push(u);url.value=u=='webos://home'?'':u;view.innerHTML=page(u);const i=$('input',view);if(i){i.onkeydown=e=>{if(e.key=='Enter')nav(i.value)}}}
+view.onclick=e=>{const a=e.target.closest('[data-u]');if(a)nav(a.dataset.u)};
+url.onkeydown=e=>{if(e.key=='Enter')nav(url.value)};go.onclick=()=>nav(url.value);
+bk.onclick=()=>{hs.pop();nav(hs[hs.length-1]||'webos://home',false)};nav('webos://home')}
+/* Calculator */
+function calc(el){const g=h('div','calc'),d=h('div','disp','0');g.append(d);let e='';
+'C ⌫ % ÷ 7 8 9 × 4 5 6 − 1 2 3 + 0 . ( =' .split(' ').forEach(k=>{const b=h('button',/[÷×−+=]/.test(k)?'op':'',k);b.onclick=()=>{
+if(k=='C')e='';else if(k=='⌫')e=e.slice(0,-1);else if(k=='='){try{if(/^[0-9+\-*/.()% ]+$/.test(e))e=String(+Function('return '+e)().toFixed(10))}catch(x){e='Error'}}
+else e+=({'÷':'/','×':'*','−':'-'})[k]||k;d.textContent=e||'0'};g.append(b)});el.append(g)}
+/* Settings */
+function settings(el){const s=h('div','set');
+const sec=(t,c)=>{const d=h('div');d.append(h('h4','',t),c);s.append(d);return c};
+const th=h('div','sw');[['Auto',''],['Dark','dark'],['Light','light']].forEach(([l,v])=>{const b=h('button','btn'+(S.theme==v?' on':''),l);b.onclick=()=>{S.theme=v;apply();save();th.querySelectorAll('.btn').forEach(x=>x.classList.toggle('on',x==b))};th.append(b)});sec('Appearance',th);
+const wl=h('div','sw');WALL.forEach((w,i)=>{const x=h('i',S.wall==i?'on':'');x.style.background=w;x.onclick=()=>{S.wall=i;apply();save();wl.querySelectorAll('i').forEach(y=>y.classList.toggle('on',y==x))};wl.append(x)});sec('Wallpaper',wl);
+const ac=h('div','sw c');ACC.forEach(c=>{const x=h('i',S.acc==c?'on':'');x.style.background=c;x.onclick=()=>{S.acc=c;apply();save();ac.querySelectorAll('i').forEach(y=>y.classList.toggle('on',y==x))};ac.append(x)});sec('Accent colour',ac);
+sec('About',h('div','path','WebOS 1.0 · runs in your browser · no data leaves this tab'));el.append(s)}
+/* Shell: icons, menu, clock, context menu */
+const ic=$('#icons');Object.entries(APPS).forEach(([id,a])=>{const d=h('div','di');d.append(h('div','ic',a.i),h('span','',a.t.replace(' Browser','')));
+d.onclick=()=>{ic.querySelectorAll('.di').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');if(matchMedia('(pointer:coarse)').matches)openApp(id)};d.ondblclick=()=>openApp(id);ic.append(d)});
+const menu=$('#menu');Object.entries(APPS).forEach(([id,a])=>{const d=h('div','',a.i+'  '+a.t);d.onclick=()=>{openApp(id);menu.classList.remove('o')};menu.append(d)});
+const rb=h('div','','🔄  Restart');rb.onclick=()=>location.reload();menu.append(rb);
+$('#st').onclick=e=>{e.stopPropagation();menu.classList.toggle('o')};
+const ctx=$('#ctx');
+$('#desk').oncontextmenu=e=>{if(e.target.closest('.win'))return;e.preventDefault();ctx.innerHTML='';
+[['🖼  Next wallpaper',()=>{S.wall=(S.wall+1)%WALL.length;apply();save()}],['⌨️  Open terminal',()=>openApp('terminal')],['⚙️  Settings',()=>openApp('settings')]].forEach(([t,f])=>{const d=h('div','',t);d.onclick=f;ctx.append(d)});
+ctx.style.left=Math.min(e.clientX,innerWidth-200)+'px';ctx.style.top=Math.min(e.clientY,innerHeight-150)+'px';ctx.classList.add('o')};
+addEventListener('pointerdown',e=>{if(!e.target.closest('#menu'))menu.classList.remove('o');if(!e.target.closest('#ctx'))ctx.classList.remove('o');if(!e.target.closest('.di'))ic.querySelectorAll('.di').forEach(x=>x.classList.remove('sel'))});
+const tick=()=>{const d=new Date();$('#clock').innerHTML=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'<br>'+d.toLocaleDateString([],{day:'numeric',month:'short'})};tick();setInterval(tick,1000);
+apply();
+setTimeout(()=>{const b=$('#boot');b.style.opacity=0;setTimeout(()=>b.remove(),600);openApp('notes',{path:['Documents'],name:'welcome.txt'})},1700);
+</script></body></html>
